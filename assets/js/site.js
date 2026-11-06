@@ -127,3 +127,52 @@
     window.addEventListener('scroll', upd, { passive: true }); upd();
   }
 })();
+
+/* ---------- practice areas: segmented tabs (works without GSAP) ---------- */
+(function () {
+  var root = document.querySelector('[data-practices]'); if (!root) return;
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+  var ink = root.querySelector('.seg-ink');
+  var seg = root.querySelector('.seg');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function place(tab) {
+    if (!ink) return;
+    var r = tab.getBoundingClientRect(), s = seg.getBoundingClientRect();
+    ink.style.setProperty('--x', (r.left - s.left) + 'px'); ink.style.setProperty('--y', (r.top - s.top) + 'px');
+    ink.style.setProperty('--w', r.width + 'px'); ink.style.setProperty('--h', r.height + 'px');
+  }
+  function select(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) {
+        panel.hidden = !on;
+        if (on && !reduced && window.gsap) {
+          window.gsap.fromTo(panel.children, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: .45, stagger: .04, ease: 'power3.out', overwrite: true });
+        }
+      }
+    });
+    place(tab); if (focus) tab.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(t); });
+    t.addEventListener('keydown', function (e) {
+      var n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
+      if (n === null) return; e.preventDefault(); select(tabs[(n + tabs.length) % tabs.length], true);
+    });
+  });
+  var current = tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0];
+  place(current);
+  window.addEventListener('resize', function () { place(tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0]); });
+  document.fonts && document.fonts.ready && document.fonts.ready.then(function () { place(tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0]); });
+
+  /* pillars: top rule draws in once, when the section arrives */
+  var pillars = Array.prototype.slice.call(document.querySelectorAll('.pillar'));
+  if ('IntersectionObserver' in window && pillars.length) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { var i = pillars.indexOf(en.target); setTimeout(function () { en.target.classList.add('is-in'); }, reduced ? 0 : i * 120); io.unobserve(en.target); } });
+    }, { threshold: .35 });
+    pillars.forEach(function (p) { io.observe(p); });
+  } else { pillars.forEach(function (p) { p.classList.add('is-in'); }); }
+})();
