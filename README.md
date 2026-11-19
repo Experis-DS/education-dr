@@ -9,7 +9,8 @@ assets/css/site.css   tokens (Experis brand refresh) + layout
 assets/js/site.js     motion: load sequence, scroll-spy, reading-path progress, count-ups, tilt
 assets/vendor/        gsap.min.js, ScrollTrigger.min.js (3.12.5, from excelerate/node_modules)
 assets/fonts/         inter-latin-opsz-normal.woff2 (fontsource, OFL)
-assets/brand/         Experis logos + favicons
+assets/brand/         Experis logos, favicons, og.jpg (social share image, 1200×630)
+tools/og/             og.html + render.mjs — the share image source; re-render after any title/cover change
 assets/covers/        page-1 renders of each PDF (pdftoppm, 110 dpi)
 assets/img/           one candid (people-b2b.png, from excelerate/public/brand)
 downloads/            the 7 PDFs, clean names, plus CollegeBuys-Experis-Collateral.zip
@@ -21,6 +22,12 @@ downloads/            the 7 PDFs, clean names, plus CollegeBuys-Experis-Collater
 python3 -m http.server 3000   # then open http://localhost:3000
 ```
 Open over http, not file:// — the preloaded font is blocked cross-origin from file://.
+
+## Share image
+
+`tools/og/og.html` is the card. With the site served over http: `node tools/og/render.mjs http://localhost:3000`
+(needs Playwright on the path) → `assets/brand/og.png`; convert to `assets/brand/og.jpg` and keep both
+`og:image` and `twitter:image` in `index.html` pointing at the absolute Pages URL.
 
 ## Deploy
 
