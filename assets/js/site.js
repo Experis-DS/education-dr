@@ -138,8 +138,8 @@
   function place(tab) {
     if (!ink) return;
     var r = tab.getBoundingClientRect(), s = seg.getBoundingClientRect();
-    ink.style.setProperty('--x', (r.left - s.left) + 'px'); ink.style.setProperty('--y', (r.top - s.top) + 'px');
-    ink.style.setProperty('--w', r.width + 'px'); ink.style.setProperty('--h', r.height + 'px');
+    ink.style.setProperty('--x', (r.left - s.left) + 'px'); ink.style.setProperty('--y', (r.bottom - s.top - 1) + 'px');
+    ink.style.setProperty('--w', r.width + 'px');
   }
   function select(tab, focus) {
     tabs.forEach(function (t) {
